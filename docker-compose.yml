@@ -2,60 +2,27 @@ version: '3.9'
 
 services:
 
-  # ─── Databases ───────────────────────────────────────────────────────────────
+  # ─── Single PostgreSQL with multiple schemas ──────────────────────────────
 
-  customerdb:
+  postgres:
     image: postgres:16-alpine
-    container_name: customerdb
+    container_name: postgres
     environment:
-      POSTGRES_DB: customerdb
+      POSTGRES_DB: appdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - customerdb_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d customerdb"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d appdb"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  productdb:
-    image: postgres:16-alpine
-    container_name: productdb
-    environment:
-      POSTGRES_DB: productdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-    volumes:
-      - productdb_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d productdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  orderdb:
-    image: postgres:16-alpine
-    container_name: orderdb
-    environment:
-      POSTGRES_DB: orderdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5434:5432"
-    volumes:
-      - orderdb_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d orderdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ─── Microservices ───────────────────────────────────────────────────────────
+  # ─── Microservices ────────────────────────────────────────────────────────
 
   customer-service:
     build:
@@ -65,13 +32,13 @@ services:
     ports:
       - "8081:8081"
     environment:
-      DB_HOST: customerdb
+      DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: customerdb
+      DB_NAME: appdb
       DB_USER: postgres
       DB_PASSWORD: postgres
     depends_on:
-      customerdb:
+      postgres:
         condition: service_healthy
 
   product-service:
@@ -82,13 +49,13 @@ services:
     ports:
       - "8082:8082"
     environment:
-      DB_HOST: productdb
+      DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: productdb
+      DB_NAME: appdb
       DB_USER: postgres
       DB_PASSWORD: postgres
     depends_on:
-      productdb:
+      postgres:
         condition: service_healthy
 
   order-service:
@@ -99,19 +66,17 @@ services:
     ports:
       - "8083:8083"
     environment:
-      DB_HOST: orderdb
+      DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: orderdb
+      DB_NAME: appdb
       DB_USER: postgres
       DB_PASSWORD: postgres
       PRODUCT_SERVICE_URL: http://product-service:8082
     depends_on:
-      orderdb:
+      postgres:
         condition: service_healthy
       product-service:
         condition: service_started
 
 volumes:
-  customerdb_data:
-  productdb_data:
-  orderdb_data:
+  postgres_data:
