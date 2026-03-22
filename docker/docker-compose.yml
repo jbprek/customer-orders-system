@@ -35,8 +35,8 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: appdb
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: customer_user
+      DB_PASSWORD: customer_pass
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,8 +52,8 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: appdb
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: product_user
+      DB_PASSWORD: product_pass
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,8 +69,8 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: appdb
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: orders_user
+      DB_PASSWORD: orders_pass
       PRODUCT_SERVICE_URL: http://product-service:8082
     depends_on:
       postgres:

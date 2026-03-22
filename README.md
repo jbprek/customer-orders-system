@@ -92,8 +92,8 @@ Default database connection: `localhost:5432/appdb` (user: `postgres`, password:
 | `DB_HOST` | `localhost` | PostgreSQL host |
 | `DB_PORT` | `5432` | PostgreSQL port |
 | `DB_NAME` | `appdb` | Database name |
-| `DB_USER` | `postgres` | Username |
-| `DB_PASSWORD` | `postgres` | Password |
+| `DB_USER` | `customer_user` / `product_user` / `orders_user` | Per-service DB user |
+| `DB_PASSWORD` | `customer_pass` / `product_pass` / `orders_pass` | Per-service DB password |
 | `PRODUCT_SERVICE_URL` | `http://localhost:8082` | order-service only |
 
 ## Building
